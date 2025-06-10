@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Advanced Dynamic Data & Image Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --bg-color: #f8f9fa; /* Light background */
+            --text-color: #343a40; /* Dark grey text */
+            --primary-color: #007bff; /* Blue */
+            --primary-hover-color: #0056b3;
+            --accent-bg-color: #e2f0fb; /* Lighter blue accent */
+            --card-bg-color: #ffffff; /* White cards */
+            --border-color: #dee2e6; /* Light grey border */
+            --box-shadow-light: rgba(0,0,0,0.08);
+            --box-shadow-medium: rgba(0,0,0,0.12);
+            --box-shadow-heavy: rgba(0,0,0,0.18);
+            --error-color: #dc3545; /* Red */
+            --success-color: #28a745; /* Green */
+            --input-bg-color: #ffffff;
+            --input-text-color: #495057;
+            --scroll-btn-bg: #6c757d; /* Grey scroll button */
+            --scroll-btn-text: white;
+            --modal-overlay-bg: rgba(0, 0, 0, 0.7);
+            --modal-content-bg: #ffffff;
+            --modal-text-color: #343a40;
+            --modal-border-radius: 12px;
+            --gap-size: 20px;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --primary-color: #66bb6a; /* Greenish */
+            --primary-hover-color: #4caf50;
+            --accent-bg-color: #343a40;
+            --card-bg-color: #495057;
+            --border-color: #6c757d;
+            --box-shadow-light: rgba(0,0,0,0.3);
+            --box-shadow-medium: rgba(0,0,0,0.4);
+            --box-shadow-heavy: rgba(0,0,0,0.5);
+            --error-color: #ef5350;
+            --success-color: #4caf50;
+            --input-bg-color: #6c757d;
+            --input-text-color: #f8f9fa;
+            --scroll-btn-bg: #adb5bd;
+            --scroll-btn-text: #212529;
+            --modal-overlay-bg: rgba(0, 0, 0, 0.85);
+            --modal-content-bg: #495057;
+            --modal-text-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: var(--gap-size);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: calc(var(--gap-size) + 5px);
+        }
+        #mainContainer {
+            display: flex;
+            max-width: 1400px; /* Increased max-width for better multi-column view */
+            margin: 0 auto;
+            gap: var(--gap-size);
+            flex-direction: row-reverse; /* Sidebar on left for wide screens */
+        }
+
+        /* Common Styling for input sections and controls */
+        .control-section {
+            background: var(--accent-bg-color);
+            padding: var(--gap-size);
+            border-radius: var(--modal-border-radius);
+            box-shadow: 0 4px 8px var(--box-shadow-light);
+            margin-bottom: var(--gap-size);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #import-method-selection {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #import-method-selection p {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 1.1em;
+        }
+        #import-method-selection .radio-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        #import-method-selection label {
+            font-size: 1.05rem;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #import-method-selection input[type="radio"] {
+            transform: scale(1.2);
+            margin-right: 5px; /* Spacing between radio and label text */
+            accent-color: var(--primary-color); /* Tint radio button */
+        }
+
+        /* Input sections */
+        .import-section {
+            display: none; /* Hidden by default */
+            flex-direction: column; /* Stack elements */
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+        .import-section.active {
+            display: flex; /* Show when active */
+        }
+        .import-section .input-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .import-section .input-group input,
+        .import-section .input-group textarea,
+        .import-section .input-group button {
+            flex-grow: 1;
+            min-width: 250px; /* Ensure input doesn't get too small */
+        }
+
+        #sheetUrl, #imageURLs, #searchInput, .filter-dropdown, #csvUpload, #uploadImages {
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            background-color: var(--input-bg-color);
+            color: var(--input-text-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #imageURLs {
+            height: 120px;
+            resize: vertical;
+        }
+        /* Drag & Drop Styling */
+        .import-section.dragover {
+            border: 2px dashed var(--primary-color);
+            background-color: var(--card-bg-color);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-color);
+            color: white;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px var(--box-shadow-light);
+        }
+        button:hover {
+            background: var(--primary-hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--box-shadow-medium);
+        }
+
+        /* Filters Section */
+        #filtersContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: var(--gap-size);
+            padding: var(--gap-size);
+            background: var(--accent-bg-color);
+            border-radius: var(--modal-border-radius);
+            box-shadow: 0 4px 8px var(--box-shadow-light);
+            display: none; /* Hidden until data loaded */
+        }
+        #filtersContainer label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+            color: var(--text-color);
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sidebar for Geo Zones (buttons) */
+        #geoZoneFilter {
+            width: 250px; /* Wider sidebar */
+            background: var(--card-bg-color);
+            border-radius: var(--modal-border-radius);
+            padding: var(--gap-size) 15px;
+            box-shadow: 0 0 12px var(--box-shadow-medium);
+            display: none; /* Hidden until data loaded */
+            flex-shrink: 0;
+            height: fit-content;
+            user-select: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        #geoZoneFilter h2 {
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        #geoZoneFilter button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #geoZoneFilter button:hover,
+        #geoZoneFilter button.active {
+            background: var(--primary-hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--box-shadow-medium);
+        }
+
+        #rightContainer {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Search input */
+        #searchInputContainer {
+            display: none; /* Hide until data is loaded */
+            margin-bottom: var(--gap-size);
+            padding: var(--gap-size);
+            background: var(--accent-bg-color);
+            border-radius: var(--modal-border-radius);
+            box-shadow: 0 4px 8px var(--box-shadow-light);
+        }
+        #searchInput {
+            width: calc(100% - 24px); /* Adjust for padding */
+            max-width: none;
+        }
+
+        /* Cards container - Responsive 3-column grid */
+        #cardsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Min 280px, fills up to 3 cols */
+            gap: var(--gap-size);
+            margin-top: var(--gap-size);
+            justify-content: center; /* Center cards if they don't fill a row */
+        }
+        .card {
+            background: var(--card-bg-color);
+            border-radius: var(--modal-border-radius);
+            box-shadow: 0 8px 16px var(--box-shadow-medium);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            /* cursor: pointer; */ /* Removed from card itself, applied to image and text for modal */
+            border: 1px solid var(--border-color); /* Subtle border */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px var(--box-shadow-heavy);
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain; /* Changed from 'cover' to 'contain' */
+            background-color: #f5f5f5; /* Optional background for transparent images */
+            padding: 5px; /* Added padding as requested */
+            border-radius: 6px; /* Added border-radius as requested */
+            border-bottom: 1px solid var(--border-color);
+            /* background: var(--input-bg-color); */ /* This might override #f5f5f5 depending on variable value */
+            flex-shrink: 0;
+            cursor: pointer; /* Image is clickable for modal */
+        }
+        .card-body {
+            padding: 18px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        .card-text {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        .small-label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-right: 5px;
+        }
+        /* Removed .image-url-link as it's replaced by .image-url-input */
+
+        /* New: Image URL Input Field */
+        .image-url-input {
+            width: calc(100% - 20px); /* Adjust for padding */
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg-color);
+            color: var(--input-text-color);
+            cursor: pointer; /* Indicate it's interactive */
+            text-overflow: ellipsis; /* Handle long URLs */
+            white-space: nowrap;
+            overflow: hidden;
+            pointer-events: auto; /* Ensure it's clickable/hoverable */
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative; /* For tooltip positioning */
+        }
+
+        .image-url-input:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Tooltip for copy */
+        .image-url-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .image-url-input::after {
+            content: "Copied!";
+            position: absolute;
+            bottom: 100%; /* Above the input */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 10;
+        }
+
+        .image-url-input.copied::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        .feedback-message {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid;
+            display: none;
+        }
+        .feedback-message.error {
+            color: var(--error-color);
+            background: #ffebeb;
+            border-color: var(--error-color);
+        }
+        .feedback-message.success {
+            color: var(--success-color);
+            background: #e6ffe6;
+            border-color: var(--success-color);
+        }
+
+        /* This is the modal's internal image URL field, keep it for modal */
+        .image-url-field {
+            margin-top: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--input-text-color);
+            background: var(--input-bg-color);
+            width: calc(100% - 20px);
+            user-select: all;
+            cursor: text;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--modal-content-bg);
+            padding: var(--gap-size);
+            border-radius: var(--modal-border-radius);
+            box-shadow: 0 10px 30px var(--box-shadow-heavy);
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            color: var(--modal-text-color);
+            text-align: center;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: var(--gap-size);
+            object-fit: contain; /* Ensure full image in modal */
+            background-color: #f5f5f5; /* Consistent background for modal image */
+        }
+        .modal-content h3 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--modal-text-color);
+        }
+        .modal-content p {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-color);
+            line-height: 1;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modal-close-btn:hover {
+            background-color: var(--primary-hover-color);
+            color: white;
+        }
+
+        /* Scroll to Top button */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: var(--gap-size);
+            right: var(--gap-size);
+            padding: 14px 18px;
+            font-size: 1.1rem;
+            background: var(--scroll-btn-bg);
+            color: var(--scroll-btn-text);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 5px 10px var(--box-shadow-light);
+            display: none;
+            z-index: 999;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        #scrollTopBtn:hover {
+            background: var(--primary-hover-color);
+            transform: scale(1.1);
+        }
+
+        /* Theme Toggle */
+        #themeToggle {
+            position: fixed;
+            top: var(--gap-size);
+            right: var(--gap-size);
+            background: var(--accent-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1001;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        #themeToggle:hover {
+            background-color: var(--card-bg-color);
+        }
+
+        /* Loading indicator */
+        .loading-message {
+            text-align: center;
+            padding: var(--gap-size);
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            #mainContainer {
+                flex-direction: column;
+                align-items: center;
+            }
+            #geoZoneFilter, #filtersContainer, #searchInputContainer, .import-section, #import-method-selection {
+                width: 100%;
+                max-width: 600px;
+            }
+            #geoZoneFilter {
+                display: flex !important; /* Force display for smaller screens */
+                flex-wrap: wrap;
+                overflow-x: auto;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 15px 10px;
+                justify-content: center;
+                gap: 10px;
+            }
+            #geoZoneFilter h2 {
+                width: 100%;
+            }
+            #geoZoneFilter button {
+                width: auto;
+                flex-shrink: 0;
+                padding: 8px 15px;
+                margin-bottom: 5px;
+            }
+            .import-section .input-group input,
+            .import-section .input-group textarea,
+            .import-section .input-group button,
+            #sheetUrl, #csvUpload, #imageURLs, #uploadImages, #searchInput, .filter-dropdown {
+                width: 100%;
+                min-width: unset;
+            }
+            .import-section .input-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+            .modal-content {
+                max-width: 95%;
+                padding: 15px;
+            }
+            .modal-content h3 {
+                font-size: 1.5rem;
+            }
+            .modal-content p {
+                font-size: 1rem;
+            }
+        }
+        @media (max-width: 768px) {
+            #cardsContainer {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Adjust for 2 columns if space allows */
+            }
+            body {
+                padding: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            #cardsContainer {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .card-title {
+                font-size: 1.15rem;
+            }
+            #import-method-selection .radio-group {
+                flex-direction: column;
+            }
+            #themeToggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced Dynamic Data & Image Viewer</h1>
+
+    <button id="themeToggle">Toggle Theme</button>
+
+    <div id="mainContainer">
+        <div id="geoZoneFilter" class="control-section">
+            <h2>Filter by Geo Zone</h2>
+            </div>
+
+        <div id="rightContainer">
+            <div id="import-method-selection" class="control-section">
+                <p>Choose your data import method:</p>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="importMethod" value="url" checked> Load Google Sheet by URL
+                    </label>
+                    <label>
+                        <input type="radio" name="importMethod" value="csv"> Upload CSV File
+                    </label>
+                    <label>
+                        <input type="radio" name="importMethod" value="manual"> Paste Image URLs
+                    </label>
+                    <label>
+                        <input type="radio" name="importMethod" value="local-images"> Upload Images from Your Device
+                    </label>
+                </div>
+            </div>
+
+            <div id="url-input-section" class="import-section active control-section">
+                <p style="margin: 0; font-weight: bold;">Enter a public Google Sheets URL:</p>
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="sheetUrl"
+                        placeholder="e.g., https://docs.google.com/spreadsheets/d/.../edit#gid=0"
+                        value="https://docs.google.com/spreadsheets/d/1X50K_L4y6zQe00B9cM0J_m8h8S3C7W_x7wQ2-g7Y3o/edit#gid=0" />
+                    <button id="loadBtnUrl">Fetch Data</button>
+                </div>
+                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">(Ensure "File > Share > Publish to web" is enabled for the sheet)</p>
+            </div>
+
+            <div id="csv-input-section" class="import-section control-section">
+                <p style="margin: 0; font-weight: bold;">Upload CSV File. Drag & Drop here or choose file:</p>
+                <div class="input-group">
+                    <input type="file" id="csvUpload" accept=".csv">
+                    <button id="loadBtnCsv">Load CSV</button>
+                </div>
+                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">CSV must contain "Image_URL" (or "ImageURL") and "Name" columns. Other columns like "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
+            </div>
+
+            <div id="manual-input-section" class="import-section control-section">
+                <p style="margin: 0; font-weight: bold;">Paste Multiple Image URLs:</p>
+                <div class="input-group">
+                    <textarea id="imageURLs" placeholder="Enter one image URL per line, or comma-separated:&#10;https://example.com/img1.jpg &#10;https://example.com/img2.png" rows="5"></textarea>
+                    <button id="loadURLs">Load Images</button>
+                </div>
+                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">(Use Ctrl+Enter or Cmd+Enter to load for large lists in textarea)</p>
+            </div>
+
+            <div id="local-images-input-section" class="import-section control-section">
+                <p style="margin: 0; font-weight: bold;">Upload Images from Your Device. Drag & Drop here or choose files:</p>
+                <div class="input-group">
+                    <input type="file" id="uploadImages" accept="image/*" multiple>
+                    <button id="loadBtnLocalImages">Show Local Images</button>
+                </div>
+                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">Images will be displayed using local object URLs. "Name" will be derived from filename. Remember to clear data to release memory for many images.</p>
+            </div>
+
+
+            <div id="filtersContainer" class="control-section">
+                <div class="filter-group">
+                    <label for="brandFilter">Filter by Brand:</label>
+                    <select id="brandFilter" class="filter-dropdown">
+                        <option value="All">All Brands</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Filter by Category:</label>
+                    <select id="categoryFilter" class="filter-dropdown">
+                        <option value="All">All Categories</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="searchInputContainer" class="control-section">
+                <input type="text" id="searchInput" placeholder="Search by name, brand, category, etc.">
+            </div>
+
+            <div id="feedbackMsg" class="feedback-message"></div>
+            <div id="cardsContainer"></div>
+
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <img id="modalImage" src="" alt="Full size image">
+            <h3 id="modalName"></h3>
+            <p><span class="small-label">Brand:</span> <span id="modalBrand"></span></p>
+            <p><span class="small-label">Category:</span> <span id="modalCategory"></span></p>
+            <p><span class="small-label">Price:</span> <span id="modalPrice"></span></p>
+            <p><span class="small-label">Description:</span> <span id="modalDescription"></span></p>
+            <p><span class="small-label">Geo Zone:</span> <span id="modalGeoZone"></span></p>
+            <p><span class="small-label">Item Number:</span> <span id="modalItemNumber"></span></p>
+            <p><span class="small-label">Master List Canada:</span> <span id="modalMasterListCanada"></span></p>
+            <label for="modalImageUrl" class="small-label">Image URL:</label>
+            <input type="text" readonly class="image-url-field" id="modalImageUrl" title="Click to select and copy this URL">
+        </div>
+    </div>
+
+    <button id="scrollTopBtn" title="Go to top">↑ Top</button>
+
+    <script>
+        let allSheetData = []; // Stores all data fetched from Google Sheet or CSV/Manual/Local
+        let currentFilteredData = []; // Stores data after filter dropdowns, before search filter
+        let localObjectURLs = []; // Array to store object URLs created for local images
+
+        // DOM Elements
+        const sheetUrlInput = document.getElementById('sheetUrl');
+        const csvUploadInput = document.getElementById('csvUpload');
+        const imageURLsInput = document.getElementById('imageURLs');
+        const uploadImagesInput = document.getElementById('uploadImages');
+        const searchInput = document.getElementById('searchInput');
+        const importMethodRadios = document.querySelectorAll('input[name="importMethod"]');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const feedbackDiv = document.getElementById('feedbackMsg');
+        const geoZoneFilterContainer = document.getElementById('geoZoneFilter');
+        const brandFilterDropdown = document.getElementById('brandFilter');
+        const categoryFilterDropdown = document.getElementById('categoryFilter');
+        const filtersContainer = document.getElementById('filtersContainer');
+        const searchInputContainer = document.getElementById('searchInputContainer');
+        const imageModal = document.getElementById('imageModal');
+        const modalCloseBtn = document.querySelector('.modal-close-btn');
+        const themeToggleBtn = document.getElementById('themeToggle');
+
+        // References to the specific input sections for drag/drop
+        const csvInputSection = document.getElementById('csv-input-section');
+        const localImagesInputSection = document.getElementById('local-images-input-section');
+
+        // Initial Filter States
+        let activeGeoZone = 'All';
+        let activeBrand = 'All';
+        let activeCategory = 'All';
+
+        // --- Helper Functions ---
+
+        // Function to revoke all current local object URLs
+        function revokeCurrentLocalObjectURLs() {
+            localObjectURLs.forEach(url => URL.revokeObjectURL(url));
+            localObjectURLs = []; // Clear the array
+        }
+
+        function displayFeedback(message, type = 'error') {
+            feedbackDiv.textContent = message;
+            feedbackDiv.className = `feedback-message ${type}`; // Add type class (error or success)
+            feedbackDiv.style.display = 'block';
+            setTimeout(() => {
+                feedbackDiv.style.display = 'none';
+                feedbackDiv.textContent = '';
+                feedbackDiv.className = 'feedback-message'; // Reset class
+            }, 8000);
+        }
+
+        function extractSpreadsheetId(url) {
+            const match = url.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            return match ? match[1] : null;
+        }
+
+        function getJsonUrlFromSheetId(sheetId, gid) {
+            return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+        }
+
+        function parseGoogleSheetJson(responseText) {
+            const jsonText = responseText.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+            if (!jsonText || jsonText.length < 2) {
+                throw new Error('Invalid Google Sheet response format. Ensure sheet is public and URL is correct. Check "File > Share > Publish to web" for the sheet.');
+            }
+            return JSON.parse(jsonText[1]);
+        }
+
+        function getColumnIndexByNameCaseInsensitive(columns, names) {
+            const lowerCaseNames = names.map(name => name.toLowerCase());
+            for (let i = 0; i < columns.length; i++) {
+                if (columns[i].label && lowerCaseNames.includes(columns[i].label.toLowerCase())) return i;
+            }
+            return -1;
+        }
+
+        // --- Data Fetching Functions ---
+        async function fetchSheetDataFromURL(url) {
+            let sheetId = extractSpreadsheetId(url);
+            if (!sheetId) throw new Error('Invalid Google Sheets URL. Please check the format.');
+
+            let gid = '0';
+            try {
+                const urlObj = new URL(url);
+                const gidParam = urlObj.searchParams.get('gid');
+                if (gidParam) gid = gidParam;
+            } catch (e) {
+                throw new Error('Invalid Google Sheets URL format.');
+            }
+
+            const jsonUrl = getJsonUrlFromSheetId(sheetId, gid);
+            const res = await fetch(jsonUrl);
+            if (!res.ok) {
+                const errorBody = await res.text();
+                throw new Error(`Failed to fetch sheet data. Status: ${res.status}. Check if the sheet is published to web or URL is correct. Response: ${errorBody.substring(0, 200)}...`);
+            }
+
+            const text = await res.text();
+            const json = parseGoogleSheetJson(text);
+
+            const cols = json.table.cols;
+            const rows = json.table.rows;
+
+            const fieldMappings = {
+                'Geo_Zone': ['Geo_Zone', 'GeoZone'],
+                'Name': ['Name'],
+                'Image_URL': ['Image_URL', 'ImageURL'],
+                'Brand': ['Brand'],
+                'Category': ['Category'],
+                'Itemnumber': ['Itemnumber', 'Item_Number', 'Item Number'], // New field
+                'Master_List_Canada': ['Master_List_Canada', 'MasterListCanada', 'Master List Canada'], // New field
+                'Price': ['Price'],
+                'Description': ['Description']
+            };
+
+            const indexes = {};
+            for (const key in fieldMappings) {
+                indexes[key] = getColumnIndexByNameCaseInsensitive(cols, fieldMappings[key]);
+                if (indexes[key] === -1 && (key === 'Name' || key === 'Image_URL')) {
+                    throw new Error(`Google Sheet is missing required column: "${fieldMappings[key].join('", "')}". Please ensure column names are exact or their common variations.`);
+                }
+            }
+
+            const data = rows.map(r => {
+                const c = r.c;
+                const item = {};
+                for (const key in fieldMappings) {
+                    item[key] = c[indexes[key]]?.v || '';
+                }
+                return item;
+            }).filter(item => item.Name || item.Image_URL);
+
+            return data;
+        }
+
+        async function fetchSheetDataFromCSV(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    reject(new Error('No CSV file selected.'));
+                    return;
+                }
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (result) => {
+                        const data = result.data;
+                        const errors = result.errors;
+
+                        if (errors.length > 0) {
+                            console.error('CSV Parsing Errors:', errors);
+                            // Optionally display a user-friendly message for parsing errors but proceed with data
+                        }
+
+                        if (data.length === 0) {
+                            reject(new Error('No data found in the CSV file. It might be empty or improperly formatted.'));
+                            return;
+                        }
+
+                        // Map CSV headers to standardized internal keys case-insensitively
+                        const headerMap = {};
+                        if (data[0]) {
+                            Object.keys(data[0]).forEach(header => {
+                                const lowerHeader = header.toLowerCase();
+                                if (['image_url', 'imageurl'].includes(lowerHeader)) {
+                                    headerMap['Image_URL'] = header;
+                                } else if (lowerHeader === 'name') {
+                                    headerMap['Name'] = header;
+                                } else if (lowerHeader === 'brand') {
+                                    headerMap['Brand'] = header;
+                                } else if (lowerHeader === 'category') {
+                                    headerMap['Category'] = header;
+                                } else if (['itemnumber', 'item_number', 'item number'].includes(lowerHeader)) {
+                                    headerMap['Itemnumber'] = header;
+                                } else if (['master_list_canada', 'masterlistcanada', 'master list canada'].includes(lowerHeader)) {
+                                    headerMap['Master_List_Canada'] = header;
+                                } else if (lowerHeader === 'price') {
+                                    headerMap['Price'] = header;
+                                } else if (lowerHeader === 'description') {
+                                    headerMap['Description'] = header;
+                                } else if (['geo_zone', 'geozone'].includes(lowerHeader)) {
+                                    headerMap['Geo_Zone'] = header;
+                                }
+                            });
+                        }
+
+                        if (!headerMap['Image_URL']) {
+                            reject(new Error('CSV must contain an "Image_URL" or "ImageURL" column.'));
+                            return;
+                        }
+                        if (!headerMap['Name']) { // Name is also a core requirement for display
+                            console.warn('CSV is missing a "Name" column. Cards will be named "No Name".');
+                        }
+
+                        const processedData = data.map(row => {
+                            return {
+                                Geo_Zone: (row[headerMap['Geo_Zone']] || '').trim(),
+                                Name: (row[headerMap['Name']] || '').trim(),
+                                Image_URL: (row[headerMap['Image_URL']] || '').trim(),
+                                Brand: (row[headerMap['Brand']] || '').trim(),
+                                Category: (row[headerMap['Category']] || '').trim(),
+                                Itemnumber: (row[headerMap['Itemnumber']] || '').trim(),
+                                Master_List_Canada: (row[headerMap['Master_List_Canada']] || '').trim(),
+                                Price: (row[headerMap['Price']] || '').trim(),
+                                Description: (row[headerMap['Description']] || '').trim(),
+                            };
+                        }).filter(item => item.Name || item.Image_URL);
+
+                        if (processedData.length === 0) {
+                            reject(new Error('No valid data found in the CSV file. Ensure it has at least Name and Image URL columns.'));
+                            return;
+                        }
+                        resolve(processedData);
+                    },
+                    error: (err) => {
+                        reject(new Error(`CSV parsing error: ${err.message}`));
+                    }
+                });
+            });
+        }
+
+        function processManualUrls(urlsText) {
+            const urls = urlsText.split(/[\n,]+/).map(line => line.trim()).filter(line => line);
+            if (urls.length === 0) {
+                throw new Error('Please enter at least one image URL.');
+            }
+            return urls.map((url, index) => ({
+                Geo_Zone: 'Manual',
+                Name: `Image ${index + 1}`,
+                Image_URL: url,
+                Brand: 'N/A',
+                Category: 'Manual URL',
+                Itemnumber: '', // Default empty for manual
+                Master_List_Canada: '', // Default empty for manual
+                Price: 'N/A',
+                Description: 'Image from pasted URL'
+            }));
+        }
+
+        async function processLocalImageFiles(files) {
+            if (!files || files.length === 0) {
+                throw new Error('No image files selected.');
+            }
+
+            revokeCurrentLocalObjectURLs(); // Clear previous object URLs before creating new ones
+            const data = [];
+
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) {
+                    console.warn(`Skipping non-image file: ${file.name}`);
+                    continue;
+                }
+
+                try {
+                    const objectURL = URL.createObjectURL(file);
+                    localObjectURLs.push(objectURL); // Store for later revocation
+
+                    const fileName = file.name.split('.').slice(0, -1).join('.'); // Name without extension
+                    data.push({
+                        Geo_Zone: 'Local',
+                        Name: fileName || 'Local Image',
+                        Image_URL: objectURL,
+                        Brand: 'Local',
+                        Category: 'Local File',
+                        Itemnumber: '', // Default empty for local
+                        Master_List_Canada: '', // Default empty for local
+                        Price: 'N/A',
+                        Description: `Local file: ${file.name}`
+                    });
+                } catch (e) {
+                    console.error(`Failed to create object URL for file ${file.name}: ${e.message}`);
+                    displayFeedback(`Could not process image: ${file.name}.`, 'error');
+                }
+            }
+
+            if (data.length === 0 && files.length > 0) {
+                throw new Error('No valid image files could be processed.');
+            } else if (data.length === 0) {
+                throw new Error('No image files selected.');
+            }
+            return data;
+        }
+
+        // --- UI Rendering Functions ---
+        function createCard(item) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.geoZone = item.Geo_Zone || '';
+            card.dataset.brand = item.Brand || '';
+            card.dataset.category = item.Category || '';
+            card.dataset.searchable = `${item.Name} ${item.Brand} ${item.Category} ${item.Itemnumber} ${item.Master_List_Canada} ${item.Geo_Zone} ${item.Description}`.toLowerCase();
+
+            const imageUrl = item.Image_URL || 'https://via.placeholder.com/300x200?text=No+Image';
+
+            const imgElement = document.createElement('img');
+            imgElement.src = imageUrl;
+            imgElement.alt = item.Name || 'No Name';
+            imgElement.loading = 'lazy';
+            imgElement.onerror = () => {
+                imgElement.src = 'https://via.placeholder.com/300x200?text=Image+Load+Error';
+                imgElement.alt = `Failed to load image for ${item.Name}`;
+            };
+            card.appendChild(imgElement);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+            cardBody.innerHTML = `
+                <h3 class="card-title">${item.Name || 'No Name'}</h3>
+                <p><span class="small-label">Brand:</span> ${item.Brand || '-'}</p>
+                <p><span class="small-label">Category:</span> ${item.Category || '-'}</p>
+                ${item.Price ? `<p><span class="small-label">Price:</span> ${item.Price}</p>` : ''}
+                ${item.Itemnumber ? `<p><span class="small-label">Item Number:</span> ${item.Itemnumber}</p>` : ''}
+                ${item.Master_List_Canada ? `<p><span class="small-label">Master List Canada:</span> ${item.Master_List_Canada}</p>` : ''}
+                ${item.Description ? `<p><span class="small-label">Description:</span> ${item.Description.substring(0, 50)}${item.Description.length > 50 ? '...' : ''}</p>` : ''}
+            `;
+
+            // Image URL Input Field
+            const imageUrlInputWrapper = document.createElement('div');
+            imageUrlInputWrapper.className = 'image-url-input-wrapper'; // Wrapper for tooltip positioning
+            const imageUrlInput = document.createElement('input');
+            imageUrlInput.type = 'text';
+            imageUrlInput.className = 'image-url-input';
+            imageUrlInput.readOnly = true;
+            imageUrlInput.value = item.Image_URL || 'No URL';
+
+            // Special handling for local image object URLs
+            if (item.Image_URL && item.Image_URL.startsWith('blob:')) {
+                imageUrlInput.value = '(Local Image)';
+                imageUrlInput.style.fontStyle = 'italic';
+                imageUrlInput.title = 'Local images do not have external URLs to copy.';
+                imageUrlInput.classList.add('local-image-url'); // Add class for specific styling/behavior if needed
+            } else {
+                imageUrlInput.title = 'Hover to copy URL';
+            }
+
+
+            // Auto-copy on hover + tooltip
+            imageUrlInput.addEventListener("mouseover", () => {
+                // Only copy if it's not a local image placeholder
+                if (!imageUrlInput.classList.contains('local-image-url') && imageUrlInput.value !== 'No URL') {
+                    imageUrlInput.select();
+                    // For modern browsers, use Clipboard API if available and permitted
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(item.Image_URL)
+                            .then(() => {
+                                imageUrlInput.classList.add('copied');
+                                setTimeout(() => {
+                                    imageUrlInput.classList.remove('copied');
+                                }, 1500); // Show "Copied!" for 1.5 seconds
+                            })
+                            .catch(err => {
+                                console.error('Failed to copy text using Clipboard API: ', err);
+                                // Fallback to document.execCommand if Clipboard API fails
+                                document.execCommand("copy");
+                                imageUrlInput.classList.add('copied');
+                                setTimeout(() => {
+                                    imageUrlInput.classList.remove('copied');
+                                }, 1500);
+                            });
+                    } else {
+                        // Fallback for older browsers
+                        document.execCommand("copy");
+                        imageUrlInput.classList.add('copied');
+                        setTimeout(() => {
+                            imageUrlInput.classList.remove('copied');
+                        }, 1500);
+                    }
+                }
+            });
+
+            imageUrlInputWrapper.appendChild(imageUrlInput);
+            cardBody.appendChild(imageUrlInputWrapper);
+            card.appendChild(cardBody);
+
+
+            // Open modal on card click (excluding the image URL link/input itself)
+            card.addEventListener('click', (event) => {
+                if (!event.target.classList.contains('image-url-link') && !event.target.classList.contains('image-url-input')) {
+                    openModal(item);
+                }
+            });
+
+            return card;
+        }
+
+        function renderCards(dataToDisplay) {
+            cardsContainer.innerHTML = '';
+            if (dataToDisplay.length === 0) {
+                cardsContainer.innerHTML = '<p class="loading-message">No matching data found.</p>';
+                return;
+            }
+            dataToDisplay.forEach(item => {
+                cardsContainer.appendChild(createCard(item));
+            });
+        }
+
+        // --- Filtering and Searching ---
+        function applyFiltersAndSearch() {
+            let dataFilteredByGeo = allSheetData;
+            if (activeGeoZone !== 'All') {
+                dataFilteredByGeo = allSheetData.filter(item => item.Geo_Zone === activeGeoZone);
+            }
+
+            let dataFilteredByBrand = dataFilteredByGeo;
+            if (activeBrand !== 'All') {
+                dataFilteredByBrand = dataFilteredByGeo.filter(item => item.Brand === activeBrand);
+            }
+
+            let dataFilteredByCategory = dataFilteredByBrand;
+            if (activeCategory !== 'All') {
+                dataFilteredByCategory = dataFilteredByBrand.filter(item => item.Category === activeCategory);
+            }
+
+            currentFilteredData = dataFilteredByCategory; // This is the data set for the search bar
+
+            const query = searchInput.value.toLowerCase();
+            const finalFilteredData = currentFilteredData.filter(item => {
+                const searchableText = `${item.Name} ${item.Brand} ${item.Category} ${item.Itemnumber} ${item.Master_List_Canada} ${item.Geo_Zone} ${item.Description}`.toLowerCase();
+                return searchableText.includes(query);
+            });
+            renderCards(finalFilteredData);
+        }
+
+        function populateFilters(data) {
+            geoZoneFilterContainer.style.display = 'block';
+            filtersContainer.style.display = 'grid'; // Show filter container
+
+            // Get unique Geo Zones
+            const zones = [...new Set(data.map(d => d.Geo_Zone).filter(z => z && z.trim() !== ''))];
+            zones.sort();
+            zones.unshift('All');
+
+            geoZoneFilterContainer.innerHTML = '<h2>Filter by Geo Zone</h2>';
+            zones.forEach(zone => {
+                const btn = document.createElement('button');
+                btn.textContent = zone || 'N/A'; // Handle empty string for Geo_Zone
+                btn.dataset.zone = zone;
+                if (zone === activeGeoZone) btn.classList.add('active');
+                btn.addEventListener('click', () => {
+                    geoZoneFilterContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeGeoZone = zone;
+                    // When Geo Zone changes, reset Brand/Category to 'All' and re-populate their options
+                    activeBrand = 'All';
+                    activeCategory = 'All';
+                    populateBrandAndCategoryFilters();
+                    applyFiltersAndSearch();
+                });
+                geoZoneFilterContainer.appendChild(btn);
+            });
+
+            populateBrandAndCategoryFilters(); // Initial population of brand/category dropdowns
+        }
+
+        function populateBrandAndCategoryFilters() {
+            // Get data based on current Geo Zone filter
+            let dataForBrandCategory = allSheetData;
+            if (activeGeoZone !== 'All') {
+                dataForBrandCategory = allSheetData.filter(item => item.Geo_Zone === activeGeoZone);
+            }
+
+            // Populate Brand Filter
+            const brands = [...new Set(dataForBrandCategory.map(d => d.Brand).filter(b => b && b.trim() !== ''))];
+            brands.sort();
+            brandFilterDropdown.innerHTML = '<option value="All">All Brands</option>' +
+                brands.map(brand => `<option value="${brand}" ${brand === activeBrand ? 'selected' : ''}>${brand}</option>`).join('');
+
+            // Populate Category Filter
+            let dataForCategory = dataForBrandCategory;
+            if (activeBrand !== 'All') {
+                dataForCategory = dataForBrandCategory.filter(item => item.Brand === activeBrand);
+            }
+            const categories = [...new Set(dataForCategory.map(d => d.Category).filter(c => c && c.trim() !== ''))];
+            categories.sort();
+            categoryFilterDropdown.innerHTML = '<option value="All">All Categories</option>' +
+                categories.map(category => `<option value="${category}" ${category === activeCategory ? 'selected' : ''}>${category}</option>`).join('');
+        }
+
+        // --- Modal Functions ---
+        function openModal(item) {
+            document.getElementById('modalImage').src = item.Image_URL || 'https://via.placeholder.com/600x400?text=No+Image';
+            document.getElementById('modalImage').alt = item.Name || 'No Name';
+            document.getElementById('modalName').textContent = item.Name || 'No Name';
+            document.getElementById('modalBrand').textContent = item.Brand || '-';
+            document.getElementById('modalCategory').textContent = item.Category || '-';
+            document.getElementById('modalPrice').textContent = item.Price || '-';
+            document.getElementById('modalDescription').textContent = item.Description || '-';
+            document.getElementById('modalGeoZone').textContent = item.Geo_Zone || '-';
+            document.getElementById('modalItemNumber').textContent = item.Itemnumber || '-';
+            document.getElementById('modalMasterListCanada').textContent = item.Master_List_Canada || '-';
+            document.getElementById('modalImageUrl').value = item.Image_URL || 'N/A';
+
+            // Handle image error in modal too
+            document.getElementById('modalImage').onerror = () => {
+                document.getElementById('modalImage').src = 'https://via.placeholder.com/600x400?text=Image+Load+Error';
+            };
+
+            imageModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+        }
+
+        function closeModal() {
+            imageModal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // --- Theme Toggle ---
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggleBtn.textContent = isDark ? 'Light Theme' : 'Dark Theme';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+            themeToggleBtn.textContent = savedTheme === 'dark' ? 'Light Theme' : 'Dark Theme';
+        }
+
+
+        // --- Main Data Loading and Display Logic ---
+        async function loadAndDisplayData(method, file = null) {
+            displayFeedback(''); // Clear any previous feedback
+            cardsContainer.innerHTML = '<p class="loading-message">Loading data...</p>';
+            geoZoneFilterContainer.style.display = 'none';
+            filtersContainer.style.display = 'none';
+            searchInputContainer.style.display = 'none';
+            searchInput.value = ''; // Clear search input on new load
+
+            // Reset filter states
+            activeGeoZone = 'All';
+            activeBrand = 'All';
+            activeCategory = 'All';
+            brandFilterDropdown.value = 'All';
+            categoryFilterDropdown.value = 'All';
+
+            // Revoke any existing object URLs before loading new data
+            revokeCurrentLocalObjectURLs();
+
+            try {
+                let data = [];
+                if (method === 'url') {
+                    if (!sheetUrlInput.value.trim()) throw new Error('Please enter a valid Google Sheets URL.');
+                    data = await fetchSheetDataFromURL(sheetUrlInput.value.trim());
+                } else if (method === 'csv') {
+                    if (!file) {
+                        if (!csvUploadInput.files || csvUploadInput.files.length === 0) {
+                            throw new Error('Please select a CSV file to upload.');
+                        }
+                        file = csvUploadInput.files[0];
+                    }
+                    data = await fetchSheetDataFromCSV(file);
+                } else if (method === 'manual') {
+                    if (!imageURLsInput.value.trim()) throw new Error('Please enter image URLs in the text area.');
+                    data = processManualUrls(imageURLsInput.value.trim());
+                } else if (method === 'local-images') {
+                    if (!file) {
+                         if (!uploadImagesInput.files || uploadImagesInput.files.length === 0) {
+                            throw new Error('Please select image files to upload.');
+                        }
+                        file = uploadImagesInput.files;
+                    }
+                    data = await processLocalImageFiles(file);
+                }
+
+
+                allSheetData = data;
+                if (allSheetData.length === 0) {
+                    cardsContainer.innerHTML = '<p class="loading-message">No data found or all rows are empty.</p>';
+                    displayFeedback('No data found or all rows are empty.', 'error');
+                    return;
+                }
+
+                // Populate all filters and apply initial display
+                populateFilters(allSheetData); // This also calls populateBrandAndCategoryFilters
+                applyFiltersAndSearch(); // Displays cards based on current filters and empty search
+
+                searchInputContainer.style.display = 'block';
+                // Filters are already set to display: grid in populateFilters
+
+                displayFeedback(`${allSheetData.length} items loaded successfully!`, 'success');
+
+            } catch (e) {
+                cardsContainer.innerHTML = '';
+                displayFeedback(`Error: ${e.message}`, 'error');
+                searchInputContainer.style.display = 'none';
+                filtersContainer.style.display = 'none';
+                geoZoneFilterContainer.style.display = 'none';
+            }
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('loadBtnUrl').addEventListener('click', () => loadAndDisplayData('url'));
+        document.getElementById('loadBtnCsv').addEventListener('click', () => loadAndDisplayData('csv'));
+        document.getElementById('loadURLs').addEventListener('click', () => loadAndDisplayData('manual'));
+        document.getElementById('loadBtnLocalImages').addEventListener('click', () => loadAndDisplayData('local-images'));
+
+        // Enter key for URL input
+        sheetUrlInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter' && document.querySelector('input[name="importMethod"]:checked').value === 'url') {
+                loadAndDisplayData('url');
+            }
+        });
+
+        // Ctrl+Enter for manual URL input
+        imageURLsInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && document.querySelector('input[name="importMethod"]:checked').value === 'manual') {
+                loadAndDisplayData('manual');
+            }
+        });
+
+        // Handle import method selection (radio buttons)
+        importMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                document.querySelectorAll('.import-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`${event.target.value}-input-section`).classList.add('active');
+
+                // Clear inputs and previous data/errors when switching methods
+                sheetUrlInput.value = "https://docs.google.com/spreadsheets/d/1X50K_L4y6zQe00B9cM0J_m8h8S3C7W_x7wQ2-g7Y3o/edit#gid=0"; // Restore example URL
+                csvUploadInput.value = '';
+                imageURLsInput.value = '';
+                uploadImagesInput.value = '';
+                searchInput.value = '';
+                cardsContainer.innerHTML = '';
+                displayFeedback('', 'error'); // Clear feedback
+                geoZoneFilterContainer.style.display = 'none';
+                filtersContainer.style.display = 'none';
+                searchInputContainer.style.display = 'none';
+
+                // Revoke any existing object URLs when switching methods
+                revokeCurrentLocalObjectURLs();
+
+                // Reset filter selections
+                activeGeoZone = 'All';
+                activeBrand = 'All';
+                activeCategory = 'All';
+                brandFilterDropdown.value = 'All';
+                categoryFilterDropdown.value = 'All';
+
+                // Focus on relevant input
+                const currentActiveInput = document.getElementById(`${event.target.value}-input-section`).querySelector('input, textarea');
+                if (currentActiveInput) currentActiveInput.focus();
+            });
+        });
+
+        // Search input event listener
+        searchInput.addEventListener('input', applyFiltersAndSearch);
+
+        // Filter dropdowns event listeners
+        brandFilterDropdown.addEventListener('change', (event) => {
+            activeBrand = event.target.value;
+            populateBrandAndCategoryFilters();
+            applyFiltersAndSearch();
+        });
+
+        categoryFilterDropdown.addEventListener('change', (event) => {
+            activeCategory = event.target.value;
+            applyFiltersAndSearch();
+        });
+
+        // Scroll to Top Button functionality
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                scrollBtn.style.display = 'block';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Modal close functionality
+        modalCloseBtn.addEventListener('click', closeModal);
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) { // Close only if clicking on overlay, not content
+                closeModal();
+            }
+        });
+        // Allow copying URL from modal
+        document.getElementById('modalImageUrl').addEventListener('click', (e) => {
+            e.target.select();
+            document.execCommand('copy');
+            alert('Image URL copied to clipboard!');
+        });
+
+        // Theme Toggle Listener
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        // CSV Drag and Drop functionality
+        csvInputSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            csvInputSection.classList.add('dragover');
+        });
+
+        csvInputSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            csvInputSection.classList.remove('dragover');
+        });
+
+        csvInputSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            csvInputSection.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                csvUploadInput.files = files;
+                loadAndDisplayData('csv', files[0]);
+                document.querySelector('input[name="importMethod"][value="csv"]').checked = true;
+                importMethodRadios.forEach(radio => radio.dispatchEvent(new Event('change')));
+            } else {
+                displayFeedback('Only .csv files are supported for CSV drag and drop.', 'error');
+            }
+        });
+
+        // Local Images Drag and Drop functionality
+        localImagesInputSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            localImagesInputSection.classList.add('dragover');
+        });
+
+        localImagesInputSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            localImagesInputSection.classList.remove('dragover');
+        });
+
+        localImagesInputSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            localImagesInputSection.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+            if (imageFiles.length > 0) {
+                const dataTransfer = new DataTransfer();
+                imageFiles.forEach(file => dataTransfer.items.add(file));
+                uploadImagesInput.files = dataTransfer.files;
+
+                loadAndDisplayData('local-images', imageFiles);
+                document.querySelector('input[name="importMethod"][value="local-images"]').checked = true;
+                importMethodRadios.forEach(radio => radio.dispatchEvent(new Event('change')));
+            } else {
+                displayFeedback('Only image files are supported for local image drag and drop.', 'error');
+            }
+        });
+
+
+        // Initialize display based on default radio selection and theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialMethod = document.querySelector('input[name="importMethod"]:checked').value;
+            document.getElementById(`${initialMethod}-input-section`).classList.add('active');
+            if (initialMethod === 'url') {
+                sheetUrlInput.value = "https://docs.google.com/spreadsheets/d/1X50K_L4y6zQe00B9cM0J_m8h8S3C7W_x7wQ2-g7Y3o/edit#gid=0";
+            }
+            loadTheme(); // Apply saved theme
+
+            // Listen for page unload/refresh to revoke object URLs
+            window.addEventListener('beforeunload', revokeCurrentLocalObjectURLs);
+        });
+    </script>
+</body>
+</html>
