@@ -6,7 +6,6 @@
     <title>Advanced Dynamic Data & Image Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        /* CSS remains unchanged */
         :root {
             --bg-color: #f8f9fa;
             --text-color: #343a40;
@@ -256,8 +255,7 @@
             display: none;
             margin-bottom: var(--gap-size);
             padding: var(--gap-size);
-            background: var(--accen
-t-bg-color);
+            background: var(--accent-bg-color);
             border-radius: var(--modal-border-radius);
             box-shadow: 0 4px 8px var(--box-shadow-light);
         }
@@ -389,8 +387,6 @@ t-bg-color);
         .feedback-message.error {
             color: var(--error-color);
             background: #ffebeb;
-
-
             border-color: var(--error-color);
         }
         .feedback-message.success {
@@ -950,15 +946,22 @@ https://example.com/img2.png" rows="5"></textarea>
             card.dataset.category = item.Category || '';
             card.dataset.searchable = `${item.Name} ${item.Brand} ${item.Category} ${item.Itemnumber} ${item.Master_List_Canada} ${item.Geo_Zone} ${item.Description}`.toLowerCase();
 
-            const imageUrl = item.Image_URL || 'https://via.placeholder.com/300x200?text=No+Image';
+            // Define the placeholder image URL
+            const placeholderImage = 'https://via.placeholder.com/300x200?text=No+Image';
+            // Use the provided Image_URL or fallback to placeholder if empty/invalid
+            const imageUrl = item.Image_URL && item.Image_URL.trim() ? item.Image_URL : placeholderImage;
 
             const imgElement = document.createElement('img');
             imgElement.src = imageUrl;
             imgElement.alt = item.Name || 'No Name';
             imgElement.loading = 'lazy';
+            // Handle image load errors to set placeholder and prevent retries
             imgElement.onerror = () => {
-                imgElement.src = 'https://via.placeholder.com/300x200?text=Image+Load+Error';
-                imgElement.alt = `Failed to load image for ${item.Name}`;
+                if (imgElement.src !== placeholderImage) { // Prevent infinite loop
+                    imgElement.src = placeholderImage;
+                    imgElement.alt = `No image available for ${item.Name || 'No Name'}`;
+                    imgElement.onerror = null; // Remove onerror to prevent further triggers
+                }
             };
             card.appendChild(imgElement);
 
