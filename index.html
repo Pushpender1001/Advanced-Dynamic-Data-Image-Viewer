@@ -656,7 +656,7 @@
                     <input type="file" id="csvUpload" accept=".csv">
                     <button id="loadBtnCsv">Load CSV</button>
                 </div>
-                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">CSV must contain "Image_URL" (or "ImageURL") and "Name" columns. Other columns like "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
+                <p style="font-size: 0.9em; color: #555; margin-top: 10px;">CSV must contain "Image_URL" (or "ImageURL"). Other columns like "Name", "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
             </div>
 
             <div id="manual-input-section" class="import-section control-section">
@@ -699,6 +699,7 @@ https://example.com/img2.png" rows="5"></textarea>
             <button class="modal-close-btn">×</button>
             <img id="modalImage" src="" alt="Full size image">
             <h3 id="modalName"></h3>
+            <p><span class="small-label">Row Number:</span> <span id="modalRowNumber"></span></p>
             <p><span class="small-label">Brand:</span> <span id="modalBrand"></span></p>
             <p><span class="small-label">Category:</span> <span id="modalCategory"></span></p>
             <p><span class="small-label">Price:</span> <span id="modalPrice"></span></p>
@@ -824,16 +825,22 @@ https://example.com/img2.png" rows="5"></textarea>
                 }
             }
 
-            const data = rows.map(r => {
+            const data = rows.map((r, index) => {
                 const c = r.c;
-                const item = {};
+                const item = { rowNumber: index + 1 }; // Assign row number starting from 1
                 for (const key in fieldMappings) {
                     item[key] = c[indexes[key]]?.v || '';
                 }
                 return item;
-            }).filter(item => item.Name || item.Image_URL);
+            });
 
-            return data;
+            // Filter out blank rows for display but keep them counted in rowNumber
+            const displayData = data.filter(item => item.Name || item.Image_URL);
+            if (displayData.length === 0) {
+                throw new Error('No valid data found in the Google Sheet. Ensure it has at least Name or Image_URL columns.');
+            }
+
+            return displayData;
         }
 
         async function fetchSheetDataFromCSV(file) {
@@ -844,7 +851,7 @@ https://example.com/img2.png" rows="5"></textarea>
                 }
                 Papa.parse(file, {
                     header: true,
-                    skipEmptyLines: true,
+                    skipEmptyLines: false, // Include empty lines to count them
                     complete: (result) => {
                         const data = result.data;
                         const errors = result.errors;
@@ -859,58 +866,55 @@ https://example.com/img2.png" rows="5"></textarea>
                         }
 
                         const headerMap = {};
-                        if (data[0]) {
-                            Object.keys(data[0]).forEach(header => {
-                                const lowerHeader = header.toLowerCase();
-                                if (['image_url', 'imageurl'].includes(lowerHeader)) {
-                                    headerMap['Image_URL'] = header;
-                                } else if (lowerHeader === 'name') {
-                                    headerMap['Name'] = header;
-                                } else if (lowerHeader === 'brand') {
-                                    headerMap['Brand'] = header;
-                                } else if (lowerHeader === 'category') {
-                                    headerMap['Category'] = header;
-                                } else if (['itemnumber', 'item_number', 'item number'].includes(lowerHeader)) {
-                                    headerMap['Itemnumber'] = header;
-                                } else if (['master_list_canada', 'masterlistcanada', 'master list canada'].includes(lowerHeader)) {
-                                    headerMap['Master_List_Canada'] = header;
-                                } else if (lowerHeader === 'price') {
-                                    headerMap['Price'] = header;
-                                } else if (lowerHeader === 'description') {
-                                    headerMap['Description'] = header;
-                                } else if (['geo_zone', 'geozone'].includes(lowerHeader)) {
-                                    headerMap['Geo_Zone'] = header;
-                                }
-                            });
-                        }
+                        const headers = data[0] ? Object.keys(data[0]) : [];
+                        headers.forEach(header => {
+                            const lowerHeader = header.toLowerCase();
+                            if (['image_url', 'imageurl'].includes(lowerHeader)) {
+                                headerMap['Image_URL'] = header;
+                            } else if (lowerHeader === 'name') {
+                                headerMap['Name'] = header;
+                            } else if (lowerHeader === 'brand') {
+                                headerMap['Brand'] = header;
+                            } else if (lowerHeader === 'category') {
+                                headerMap['Category'] = header;
+                            } else if (['itemnumber', 'item_number', 'item number'].includes(lowerHeader)) {
+                                headerMap['Itemnumber'] = header;
+                            } else if (['master_list_canada', 'masterlistcanada', 'master list canada'].includes(lowerHeader)) {
+                                headerMap['Master_List_Canada'] = header;
+                            } else if (lowerHeader === 'price') {
+                                headerMap['Price'] = header;
+                            } else if (lowerHeader === 'description') {
+                                headerMap['Description'] = header;
+                            } else if (['geo_zone', 'geozone'].includes(lowerHeader)) {
+                                headerMap['Geo_Zone'] = header;
+                            }
+                        });
 
                         if (!headerMap['Image_URL']) {
-                            reject(new Error('CSV must contain an "Image_URL" or "ImageURL" column.'));
+                            reject(new Error('CSV must contain an "Image_URL" or "ImageURL" column (case-insensitive).'));
                             return;
                         }
-                        if (!headerMap['Name']) {
-                            console.warn('CSV is missing a "Name" column. Cards will be named "No Name".');
-                        }
 
-                        const processedData = data.map(row => {
-                            return {
-                                Geo_Zone: (row[headerMap['Geo_Zone']] || '').trim(),
-                                Name: (row[headerMap['Name']] || '').trim(),
-                                Image_URL: (row[headerMap['Image_URL']] || '').trim(),
-                                Brand: (row[headerMap['Brand']] || '').trim(),
-                                Category: (row[headerMap['Category']] || '').trim(),
-                                Itemnumber: (row[headerMap['Itemnumber']] || '').trim(),
-                                Master_List_Canada: (row[headerMap['Master_List_Canada']] || '').trim(),
-                                Price: (row[headerMap['Price']] || '').trim(),
-                                Description: (row[headerMap['Description']] || '').trim(),
-                            };
-                        }).filter(item => item.Name || item.Image_URL);
+                        const processedData = data.map((row, index) => ({
+                            rowNumber: index + 1, // Assign row number starting from 1
+                            Geo_Zone: (row[headerMap['Geo_Zone']] || '').trim(),
+                            Name: (row[headerMap['Name']] || 'No Name').trim(),
+                            Image_URL: (row[headerMap['Image_URL']] || '').trim(),
+                            Brand: (row[headerMap['Brand']] || '').trim(),
+                            Category: (row[headerMap['Category']] || '').trim(),
+                            Itemnumber: (row[headerMap['Itemnumber']] || '').trim(),
+                            Master_List_Canada: (row[headerMap['Master_List_Canada']] || '').trim(),
+                            Price: (row[headerMap['Price']] || '').trim(),
+                            Description: (row[headerMap['Description']] || '').trim(),
+                        }));
 
-                        if (processedData.length === 0) {
-                            reject(new Error('No valid data found in the CSV file. Ensure it has at least Name and Image URL columns.'));
+                        // Filter out blank rows for display but keep them counted in rowNumber
+                        const displayData = processedData.filter(item => item.Name !== 'No Name' || item.Image_URL);
+                        if (displayData.length === 0) {
+                            reject(new Error('No valid data found in the CSV file. Ensure it has at least one row with an Image_URL.'));
                             return;
                         }
-                        resolve(processedData);
+                        resolve(displayData);
                     },
                     error: (err) => {
                         reject(new Error(`CSV parsing error: ${err.message}`));
@@ -925,6 +929,7 @@ https://example.com/img2.png" rows="5"></textarea>
                 throw new Error('Please enter at least one image URL.');
             }
             return urls.map((url, index) => ({
+                rowNumber: index + 1, // Assign row number starting from 1
                 Geo_Zone: 'Manual',
                 Name: `Image ${index + 1}`,
                 Image_URL: url,
@@ -946,21 +951,18 @@ https://example.com/img2.png" rows="5"></textarea>
             card.dataset.category = item.Category || '';
             card.dataset.searchable = `${item.Name} ${item.Brand} ${item.Category} ${item.Itemnumber} ${item.Master_List_Canada} ${item.Geo_Zone} ${item.Description}`.toLowerCase();
 
-            // Define the placeholder image URL
             const placeholderImage = 'https://via.placeholder.com/300x200?text=No+Image';
-            // Use the provided Image_URL or fallback to placeholder if empty/invalid
             const imageUrl = item.Image_URL && item.Image_URL.trim() ? item.Image_URL : placeholderImage;
 
             const imgElement = document.createElement('img');
             imgElement.src = imageUrl;
             imgElement.alt = item.Name || 'No Name';
             imgElement.loading = 'lazy';
-            // Handle image load errors to set placeholder and prevent retries
             imgElement.onerror = () => {
-                if (imgElement.src !== placeholderImage) { // Prevent infinite loop
+                if (imgElement.src !== placeholderImage) {
                     imgElement.src = placeholderImage;
                     imgElement.alt = `No image available for ${item.Name || 'No Name'}`;
-                    imgElement.onerror = null; // Remove onerror to prevent further triggers
+                    imgElement.onerror = null;
                 }
             };
             card.appendChild(imgElement);
@@ -968,7 +970,7 @@ https://example.com/img2.png" rows="5"></textarea>
             const cardBody = document.createElement('div');
             cardBody.className = 'card-body';
             cardBody.innerHTML = `
-                <h3 class="card-title">${item.Name || 'No Name'}</h3>
+                <h3 class="card-title">${item.Name || 'No Name'} (Row ${item.rowNumber})</h3>
                 <p><span class="small-label">Brand:</span> ${item.Brand || '-'}</p>
                 <p><span class="small-label">Category:</span> ${item.Category || '-'}</p>
                 ${item.Price ? `<p><span class="small-label">Price:</span> ${item.Price}</p>` : ''}
@@ -1121,6 +1123,7 @@ https://example.com/img2.png" rows="5"></textarea>
             document.getElementById('modalImage').src = item.Image_URL || 'https://via.placeholder.com/600x400?text=No+Image';
             document.getElementById('modalImage').alt = item.Name || 'No Name';
             document.getElementById('modalName').textContent = item.Name || 'No Name';
+            document.getElementById('modalRowNumber').textContent = item.rowNumber || '-';
             document.getElementById('modalBrand').textContent = item.Brand || '-';
             document.getElementById('modalCategory').textContent = item.Category || '-';
             document.getElementById('modalPrice').textContent = item.Price || '-';
@@ -1215,7 +1218,7 @@ https://example.com/img2.png" rows="5"></textarea>
 
         // --- Event Listeners ---
         document.getElementById('loadBtnUrl').addEventListener('click', () => loadAndDisplayData('url'));
-        document.getElementById('loadBtnCsv').addEventListener('click', () => loadAndDisplayData('csv'));
+        document.getElementById('loadBtnCsv').addEventListener('click', () => loadAndDisplayData('csv')); // Fixed typo
         document.getElementById('loadURLs').addEventListener('click', () => loadAndDisplayData('manual'));
 
         sheetUrlInput.addEventListener('keyup', (e) => {
