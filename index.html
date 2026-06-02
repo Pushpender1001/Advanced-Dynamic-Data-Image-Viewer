@@ -102,47 +102,47 @@
       </div>
 
       <!-- DATA SOURCE CONTROL PANEL -->
-      <div id="control-panel" class="space-y-6">
+      <div id="control-panel" class="space-y-6 animate-fade-in">
         <div class="text-center max-w-2xl mx-auto py-4">
-          <h2 class="text-xl sm:text-2xl font-bold text-slate-850 tracking-tight">Load Your Dynamic Catalog Feed</h2>
-          <p class="text-slate-500 mt-2 text-xs sm:text-sm leading-relaxed">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Load Your Dynamic Catalog Feed</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-2 text-xs sm:text-sm leading-relaxed">
             Supply a Google Sheets link, upload a local CSV spreadsheet, or manually specify raw image URLs. The engine analyzes headers case-insensitively and binds references.
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <!-- OPTION 1: GOOGLE SHET LINK -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+          <!-- OPTION 1: GOOGLE SHEET LINK -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-4">
-                <div class="bg-green-100 text-green-700 p-2.5 rounded-xl">
+                <div class="bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 p-2.5 rounded-xl">
                   <i data-lucide="globe" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-slate-800 text-sm">Google Sheets Link</h3>
-                  <p class="text-[11px] text-slate-400">Sync with online sheets</p>
+                  <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Google Sheets Link</h3>
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500">Sync with online sheets</p>
                 </div>
               </div>
               
               <div class="space-y-3">
                 <div class="space-y-1">
-                  <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sheet Address / URL</label>
+                  <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sheet Address / URL</label>
                   <input 
                     type="url" 
                     id="sheetUrlInput" 
                     placeholder="https://docs.google.com/spreadsheets/d/..." 
-                    class="w-full text-xs rounded-lg border border-slate-200 px-3 py-2 bg-slate-50/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                    class="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2 bg-slate-50/55 dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-505 transition-colors"
                   />
                 </div>
-                <p class="text-[10px] text-slate-400 leading-normal">
+                <p class="text-[10px] text-slate-400 dark:text-slate-550 leading-normal">
                   Requires <strong>Image_URL</strong> (or ImageURL). Other headers are optional and case-insensitive.
                 </p>
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 mt-5">
-              <button id="loadBtnUrl" class="w-full inline-flex items-center justify-center space-x-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer transition active:scale-95 duration-100">
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-800 mt-5">
+              <button id="loadBtnUrl" class="w-full inline-flex items-center justify-center space-x-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer transition active:scale-95 duration-100 shadow-sm">
                 <span>Load Google Sheet</span>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
               </button>
@@ -150,26 +150,26 @@
           </div>
 
           <!-- OPTION 2: LOCAL CSV FILE UPLOAD -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-4">
-                <div class="bg-indigo-100 text-indigo-700 p-2.5 rounded-xl">
+                <div class="bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 p-2.5 rounded-xl">
                   <i data-lucide="upload-cloud" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-slate-800 text-sm">Upload CSV file</h3>
-                  <p class="text-[11px] text-slate-400">Read local file directly</p>
+                  <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Upload CSV file</h3>
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500">Read local file directly</p>
                 </div>
               </div>
 
               <!-- Drag/Drop Section -->
               <div 
                 id="drop-zone"
-                class="border-2 border-dashed border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/10 rounded-xl p-5 text-center cursor-pointer transition flex flex-col justify-center items-center"
+                class="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/10 rounded-xl p-5 text-center cursor-pointer transition flex flex-col justify-center items-center"
               >
-                <i data-lucide="upload" class="w-6 h-6 text-slate-400 mb-2"></i>
-                <span class="text-[11px] font-medium text-slate-600">Drag files here or <span class="text-indigo-600 underline">browse</span></span>
-                <span class="text-[9px] text-slate-400 mt-1">Accepts CSV tabular spreadsheets</span>
+                <i data-lucide="upload" class="w-6 h-6 text-slate-400 dark:text-slate-550 mb-2"></i>
+                <span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Drag files here or <span class="text-indigo-650 dark:text-indigo-400 underline">browse</span></span>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Accepts CSV tabular spreadsheets</span>
                 <input 
                   type="file" 
                   id="csvUpload" 
@@ -179,23 +179,23 @@
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 mt-5 flex space-x-2">
-              <button id="loadBtnCsv" class="w-full inline-flex items-center justify-center space-x-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer transition active:scale-95 duration-100">
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-800 mt-5 flex space-x-2">
+              <button id="loadBtnCsv" class="w-full inline-flex items-center justify-center space-x-1.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer transition active:scale-95 duration-100">
                 <span>Load CSV File</span>
               </button>
             </div>
           </div>
 
           <!-- OPTION 3: MANUAL IMAGE URLS LIST -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-4">
-                <div class="bg-blue-100 text-blue-700 p-2.5 rounded-xl">
+                <div class="bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 p-2.5 rounded-xl">
                   <i data-lucide="image-plus" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-slate-800 text-sm">Manual Paste URLs</h3>
-                  <p class="text-[11px] text-slate-400">Put raw links list</p>
+                  <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Manual Paste URLs</h3>
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500">Put raw links list</p>
                 </div>
               </div>
 
@@ -203,12 +203,12 @@
                 <textarea 
                   id="manual-urls-input" 
                   placeholder="https://images.unsplash.com/...&#10;https://images.unsplash.com/..." 
-                  class="w-full min-h-[90px] text-[11px] font-mono rounded-lg border border-slate-200 p-2 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all leading-normal"
+                  class="w-full min-h-[90px] text-[11px] font-mono rounded-lg border border-slate-200 dark:border-slate-800 p-2 bg-slate-50/50 dark:bg-slate-950 text-slate-850 dark:text-slate-150 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all leading-normal"
                 ></textarea>
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 mt-5">
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-800 mt-5">
               <button id="loadURLs" class="w-full inline-flex items-center justify-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer transition active:scale-95 duration-100">
                 <span>Load Image List</span>
               </button>
@@ -218,12 +218,12 @@
         </div>
 
         <!-- HELP / INFORMATION NOTICES -->
-        <div class="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 max-w-4xl mx-auto">
+        <div class="bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 rounded-2xl p-4 max-w-4xl mx-auto">
           <div class="flex space-x-3">
-            <i data-lucide="info" class="w-4 h-4 text-amber-700 shrink-0 mt-0.5"></i>
-            <div class="space-y-2 text-[11px] sm:text-xs text-amber-800/90 leading-relaxed">
+            <i data-lucide="info" class="w-4 h-4 text-amber-700 dark:text-amber-500 shrink-0 mt-0.5"></i>
+            <div class="space-y-2 text-[11px] sm:text-xs text-amber-800/90 dark:text-amber-300/90 leading-relaxed">
               <p>CSV must contain "Image_URL" (or "ImageURL") and "Name" columns. Other columns like "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
-              <p class="pt-1.5 border-t border-amber-200/30">CSV must contain "Image_URL" (or "ImageURL"). Other columns like "Name", "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
+              <p class="pt-1.5 border-t border-amber-200/35 dark:border-amber-900/30">CSV must contain "Image_URL" (or "ImageURL"). Other columns like "Name", "Brand", "Category", "Price", "Description", "Itemnumber", "Master_List_Canada" are optional and case-insensitive.</p>
             </div>
           </div>
         </div>
@@ -232,10 +232,10 @@
       <!-- INGESTION PROGRESS FEEDBACK SPINNER -->
       <div id="loading-spinner" class="hidden py-24 flex flex-col items-center justify-center space-y-4">
         <div class="relative flex items-center justify-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-indigo-600"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 dark:border-slate-805 border-t-indigo-600"></div>
           <i data-lucide="sparkles" class="w-4.5 h-4.5 text-indigo-600 animate-pulse absolute"></i>
         </div>
-        <div class="text-center font-medium text-slate-600 text-xs">
+        <div class="text-center font-medium text-slate-600 dark:text-slate-400 text-xs">
           Fetching and executing document parsed mappings...
         </div>
       </div>
@@ -244,40 +244,40 @@
       <div id="results-section" class="hidden space-y-6 flex-1 flex flex-col">
         
         <!-- SEARCH BOX & ADVANCED FILTER CONTROLS -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl p-4 sm:p-5 shadow-xs transition-colors">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 class="font-bold text-slate-800 text-sm flex items-center">
-                <i data-lucide="settings-2" class="w-4 h-4 text-indigo-600 mr-2"></i>
+              <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center">
+                <i data-lucide="settings-2" class="w-4 h-4 text-indigo-600 dark:text-indigo-405 mr-2"></i>
                 Filter & Search Loaded Ingestions
               </h3>
-              <p class="text-xs text-slate-500 mt-1">
-                Showing <span id="filtered-count" class="font-bold text-indigo-600 font-mono text-xs">0</span> of <span id="total-count" class="font-semibold text-slate-700">0</span> items loaded.
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Showing <span id="filtered-count" class="font-bold text-indigo-600 dark:text-indigo-400 font-mono text-xs">0</span> of <span id="total-count" class="font-semibold text-slate-700 dark:text-slate-300">0</span> items loaded.
               </p>
             </div>
 
             <!-- Single Line Quick Reset -->
-            <button id="reset-inputs-btn" class="inline-flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-semibold class-pointer transition self-end sm:self-auto">
+            <button id="reset-inputs-btn" class="inline-flex items-center space-x-1.5 text-slate-505 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-805 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition self-end sm:self-auto">
               <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
               <span>Reset Filters</span>
             </button>
           </div>
 
           <!-- Ingestion filter criteria boxes -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-100">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
             
             <!-- Quick Substring Matching -->
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-550">
                 <i data-lucide="search" class="w-4 h-4"></i>
               </span>
               <input 
                 type="text" 
                 id="searchQuery" 
                 placeholder="Search catalog fields..." 
-                class="w-full text-xs pl-9 pr-8 py-2 border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors"
+                class="w-full text-xs pl-9 pr-8 py-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors"
               />
-              <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600 cursor-pointer">
+              <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-450 hover:text-slate-650 cursor-pointer">
                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
               </button>
             </div>
@@ -286,7 +286,7 @@
             <div>
               <select 
                 id="categoryFilter" 
-                class="w-full text-xs py-2 px-3 border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                class="w-full text-xs py-2 px-3 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-950 text-slate-80	0 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
               >
                 <option value="all">Categories (All)</option>
               </select>
@@ -296,20 +296,61 @@
             <div>
               <select 
                 id="geozoneFilter" 
-                class="w-full text-xs py-2 px-3 border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                class="w-full text-xs py-2 px-3 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
               >
                 <option value="all">Geo Zones (All)</option>
               </select>
             </div>
 
           </div>
+
+          <!-- Dyn COLUMN SHOW/HIDE CHECKBOXES (Requirement 3) -->
+          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2.5">
+              Select Visible Card Elements / Content Columns
+            </span>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-image" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Images</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-name" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Name</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-description" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Description</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-brand" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Brand</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-category" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Category</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-itemnumber" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Items No.</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-price" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium font-mono">Price</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer selection:bg-transparent select-none transition">
+                <input type="checkbox" id="col-visible-geozone" checked class="rounded border-slate-300 dark:border-slate-700 text-indigo-650 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Geo Zone</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <!-- ITEMS GRID -->
-        <div id="no-match-alert" class="hidden bg-white border border-slate-200 rounded-2xl py-12 px-4 text-center">
-          <i data-lucide="image-off" class="w-10 h-10 text-slate-350 mx-auto mb-3"></i>
-          <h4 class="font-semibold text-slate-800 text-sm">No Match Found</h4>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 leading-normal">
+        <div id="no-match-alert" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl py-12 px-4 text-center">
+          <i data-lucide="image-off" class="w-10 h-10 text-slate-350 dark:text-slate-600 mx-auto mb-3"></i>
+          <h4 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">No Match Found</h4>
+          <p class="text-xs text-slate-505 dark:text-slate-400 max-w-sm mx-auto mt-1 leading-normal">
             We couldn't locate any products in the catalog index matching your search terms or filter constraints.
           </p>
         </div>
@@ -325,18 +366,24 @@
     <!-- FLOATING EXPANDED ITEM MODAL VIEW -->
     <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
       <!-- Backdrop mask blur -->
-      <div id="modal-backdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-200"></div>
+      <div id="modal-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-200"></div>
 
       <!-- Container Box -->
-      <div class="relative w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row border border-slate-150 transform transition-all scale-95 opacity-0 duration-200" id="modal-box">
+      <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row border border-slate-150 dark:border-slate-850 transform transition-all scale-95 opacity-0 duration-200" id="modal-box">
         
         <!-- Close Button top corner -->
-        <button id="modal-close-btn" class="absolute top-4 right-4 z-10 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 p-1.5 rounded-full transition cursor-pointer active:scale-95">
+        <button id="modal-close-btn" class="absolute top-4 right-4 z-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 p-1.5 rounded-full transition cursor-pointer active:scale-95">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
 
         <!-- Graphic Image Column -->
-        <div class="w-full md:w-1/2 bg-slate-50/50 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-100 relative min-h-[220px]">
+        <div class="w-full md:w-1/2 bg-slate-50/50 dark:bg-slate-950 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-850 relative min-h-[220px]">
+          <!-- Copy Product Name Button (floating on the left side of image) (Requirement 4) -->
+          <button id="modal-copy-btn" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs select-none shadow-md text-slate-700 dark:text-slate-200 hover:text-indigo-650 dark:hover:text-indigo-400 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 transition hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center group" title="Copy Product Name to Clipboard">
+            <i data-lucide="copy" class="w-4 h-4" id="modal-copy-icon"></i>
+            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition duration-155 whitespace-nowrap pointer-events-none" id="modal-copy-tooltip">Copy Name</span>
+          </button>
+
           <img 
             id="modalImage" 
             src="" 
@@ -349,7 +396,7 @@
             href="" 
             target="_blank" 
             rel="noreferrer" 
-            class="absolute bottom-4 left-4 bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 p-1.5 rounded-lg border border-slate-200 shadow-3xs text-[10px] font-semibold font-mono flex items-center space-x-1"
+            class="absolute bottom-4 left-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-3xs text-[10px] font-semibold font-mono flex items-center space-x-1"
           >
             <i data-lucide="external-link" class="w-3 h-3"></i>
             <span>View Original image</span>
@@ -362,66 +409,75 @@
             
             <!-- Tab Row metadata tags -->
             <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
-              <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-lg border border-indigo-100/50">
+              <span class="bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded-lg border border-indigo-100/50 dark:border-indigo-900/30">
                 Row <span id="modalRowNumber">-</span>
               </span>
-              <span id="modalCategoryBadge" class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-lg hidden">
+              <span id="modalCategoryBadge" class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 text-[10px] font-semibold px-2 py-0.5 rounded-lg hidden">
                 -
               </span>
             </div>
 
             <!-- Product name title -->
             <div>
-              <h3 id="modalName" class="font-bold text-slate-800 text-lg md:text-xl leading-tight"></h3>
-              <p id="modalBrandText" class="text-xs text-slate-400 font-bold uppercase mt-1 hidden"></p>
+              <h3 id="modalName" class="font-bold text-slate-800 dark:text-slate-100 text-lg md:text-xl leading-tight"></h3>
+              <p id="modalBrandText" class="text-xs text-slate-400 dark:text-slate-550 font-bold uppercase mt-1 hidden"></p>
             </div>
 
             <!-- Description -->
             <div id="modalDescriptionContainer" class="hidden">
-              <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Description</h4>
-              <p id="modalDescription" class="text-xs text-slate-650 font-normal leading-relaxed overflow-y-auto max-h-[120px] pr-2 custom-scrollbar"></p>
+              <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-1">Description</h4>
+              <p id="modalDescription" class="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed overflow-y-auto max-h-[120px] pr-2 custom-scrollbar"></p>
             </div>
 
             <!-- Form metadata blocks list -->
-            <div class="space-y-2 border-t border-slate-100 pt-3.5 text-xs">
+            <div class="space-y-2 border-t border-slate-100 dark:border-slate-800 pt-3.5 text-xs">
               
               <!-- Brand line -->
               <div class="flex justify-between items-center py-0.5" id="modal-brand-row">
-                <span class="text-slate-450 font-medium">Brand</span>
-                <span id="modalBrand" class="text-slate-800 font-semibold">-</span>
+                <span class="text-slate-400 dark:text-slate-550 font-medium">Brand</span>
+                <span id="modalBrand" class="text-slate-850 dark:text-slate-200 font-semibold">-</span>
               </div>
 
               <!-- Item Number -->
               <div class="flex justify-between items-center py-0.5">
-                <span class="text-slate-450 font-medium">Item Number</span>
-                <span id="modalItemnumber" class="text-slate-800 font-semibold font-mono">-</span>
+                <span class="text-slate-400 dark:text-slate-550 font-medium">Item Number</span>
+                <span id="modalItemnumber" class="text-slate-850 dark:text-slate-200 font-semibold font-mono">-</span>
               </div>
 
               <!-- Geo Zone -->
               <div class="flex justify-between items-center py-0.5">
-                <span class="text-slate-450 font-medium">Geo Zone</span>
-                <span id="modalGeoZone" class="text-slate-800 font-semibold">-</span>
+                <span class="text-slate-400 dark:text-slate-550 font-medium">Geo Zone</span>
+                <span id="modalGeoZone" class="text-slate-850 dark:text-slate-200 font-semibold">-</span>
               </div>
 
               <!-- Master Canada status -->
               <div class="flex justify-between items-center py-0.5">
-                <span class="text-slate-450 font-medium">Master List Canada</span>
-                <span id="modalMasterCanada" class="text-slate-800 font-semibold font-mono text-[11px]">-</span>
+                <span class="text-slate-400 dark:text-slate-550 font-medium">Master List Canada</span>
+                <span id="modalMasterCanada" class="text-slate-850 dark:text-slate-200 font-semibold font-mono text-[11px]">-</span>
               </div>
 
             </div>
           </div>
 
           <!-- Price & Close segment footing -->
-          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">Price</span>
-              <span id="modalPrice" class="text-lg font-extrabold text-indigo-600 font-mono mt-0.5 block">-</span>
+              <span class="text-[10px] text-slate-400 dark:text-slate-550 block font-bold uppercase tracking-wider">Price</span>
+              <span id="modalPrice" class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400 font-mono mt-0.5 block">-</span>
             </div>
 
-            <button id="modal-close-foot" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 px-4 rounded-xl cursor-pointer transition duration-150 shadow-xs active:scale-95">
-              Close View
-            </button>
+            <!-- Action buttons: Prev, Next, Close (Requirement 1) -->
+            <div class="flex items-center space-x-2">
+              <button id="modal-prev-btn" class="inline-flex items-center justify-center p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition cursor-pointer active:scale-95" title="Previous Product">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button id="modal-next-btn" class="inline-flex items-center justify-center p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition cursor-pointer active:scale-95" title="Next Product">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+              <button id="modal-close-foot" class="bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl cursor-pointer transition duration-150 shadow-xs active:scale-95">
+                Close View
+              </button>
+            </div>
           </div>
 
         </div>
@@ -430,18 +486,51 @@
     </div>
 
 
-    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-405">
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-850 py-6 mt-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 dark:text-slate-500">
         <p>&copy; 2026 Sheet & CSV Catalog Viewer. All rights reserved.</p>
       </div>
     </footer>
 
+    <!-- FLOATING ACTION DOCK: Smooth Scroll Up & Down Controls (Requirement 1) -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col space-y-2 select-none">
+      <!-- Scroll Up -->
+      <button 
+        id="scroll-to-top-btn" 
+        class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 shadow-lg cursor-pointer transition duration-150 active:scale-90" 
+        title="Scroll to Top"
+      >
+        <i data-lucide="arrow-up" class="w-4.5 h-4.5"></i>
+      </button>
+      <!-- Scroll Down -->
+      <button 
+        id="scroll-to-bottom-btn" 
+        class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 shadow-lg cursor-pointer transition duration-150 active:scale-90" 
+        title="Scroll to Bottom"
+      >
+        <i data-lucide="arrow-down" class="w-4.5 h-4.5"></i>
+      </button>
+    </div>
 
     <!-- CORE APPLICATION JAVASCRIPT -->
     <script>
       // Global Products Collection Status State
       let allProducts = [];
+      let activeFilteredProducts = [];
+      let currentModalIndex = -1;
       const parentEmptyImage = "https://images.unsplash.com/photo-1594322436404-5a0526db4d13?q=80&w=300&auto=format&fit=crop";
+
+      // Column visibility state (Requirement 3)
+      let activeColumns = {
+        image: true,
+        name: true,
+        description: true,
+        brand: true,
+        category: true,
+        itemnumber: true,
+        price: true,
+        geozone: true
+      };
 
       // Elements References
       const uploadInput = document.getElementById("csvUpload");
@@ -478,9 +567,10 @@
       // -------------------------------------------------------------
       // Initializer setup
       document.addEventListener("DOMContentLoaded", () => {
-        // Init Lucide
-        lucide.createIcons();
         setupEvents();
+        setupColumnVisibilityListeners();
+        initializeTheme();
+        lucide.createIcons();
       });
 
       // 1. Alert Handler
@@ -498,6 +588,7 @@
       // 2. Global Clear All State Handler
       function handleClearData() {
         allProducts = [];
+        activeFilteredProducts = [];
         urlInput.value = "";
         uploadInput.value = "";
         manualArea.value = "";
@@ -599,13 +690,88 @@
         modalCloseFoot.addEventListener("click", closeModal);
         modalBackdrop.addEventListener("click", closeModal);
 
-        // Close on ESC
+        // Close on ESC, or navigate sequentially with Arrows (Requirement 1)
         document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-            closeModal();
+          if (!modal.classList.contains("hidden")) {
+            if (e.key === "Escape") {
+              closeModal();
+            } else if (e.key === "ArrowLeft") {
+              navigateModalSequential(-1);
+            } else if (e.key === "ArrowRight") {
+              navigateModalSequential(1);
+            }
+          }
+        });
+
+        // Sequential Navigation click listeners (Requirement 1)
+        document.getElementById("modal-prev-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          navigateModalSequential(-1);
+        });
+        document.getElementById("modal-next-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          navigateModalSequential(1);
+        });
+
+        // Wire Floating View Scrolling controls (Requirement 1)
+        document.getElementById("scroll-to-top-btn").addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        document.getElementById("scroll-to-bottom-btn").addEventListener("click", () => {
+          window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+        });
+      }
+
+      // Column visibility toggle actions loader (Requirement 3)
+      function setupColumnVisibilityListeners() {
+        const cols = ["image", "name", "description", "brand", "category", "itemnumber", "price", "geozone"];
+        cols.forEach(col => {
+          const chk = document.getElementById(`col-visible-${col}`);
+          if (chk) {
+            // Restore from localStorage Cache
+            const saved = localStorage.getItem(`col-visible-${col}`);
+            if (saved !== null) {
+              activeColumns[col] = saved === "true";
+              chk.checked = activeColumns[col];
+            }
+            chk.addEventListener("change", (e) => {
+              activeColumns[col] = e.target.checked;
+              localStorage.setItem(`col-visible-${col}`, e.target.checked);
+              applyFilters(); // Re-render instantly
+            });
           }
         });
       }
+
+      // Light / Dark Theme Mode Manager (Requirement 2)
+      const themeToggleBtn = document.getElementById("theme-toggle-btn");
+      const sunIcon = document.getElementById("theme-icon-sun");
+      const moonIcon = document.getElementById("theme-icon-moon");
+
+      function initializeTheme() {
+        const isDark = localStorage.getItem("theme") === "dark" || 
+                      (localStorage.getItem("theme") === null && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        applyTheme(isDark);
+      }
+
+      function applyTheme(isDark) {
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+          sunIcon.classList.remove("hidden");
+          moonIcon.classList.add("hidden");
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+          sunIcon.classList.add("hidden");
+          moonIcon.classList.remove("hidden");
+          localStorage.setItem("theme", "light");
+        }
+      }
+
+      themeToggleBtn.addEventListener("click", () => {
+        const isCurrentDark = document.documentElement.classList.contains("dark");
+        applyTheme(!isCurrentDark);
+      });
 
       // 4. MAIN INGESTION ROUTER
       async function loadAndDisplayData(sourceType) {
@@ -639,7 +805,6 @@
             controlPanel.classList.remove("hidden");
           } finally {
             loadingSpinner.classList.add("hidden");
-            // Re-render Lucide icons dynamically added
             lucide.createIcons();
           }
         }, 150);
@@ -857,6 +1022,8 @@
           return true;
         });
 
+        activeFilteredProducts = filtered; // Sync with global variable for sequential routing
+
         // Set counters
         document.getElementById("filtered-count").innerText = filtered.length;
         document.getElementById("total-count").innerText = allProducts.length;
@@ -873,83 +1040,179 @@
         }
       }
 
+      // Copying Clipboard handler featuring positive transient check feedback (Requirement 4)
+      function copyToClipboard(e, text) {
+        if (e) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+        
+        navigator.clipboard.writeText(text).then(() => {
+          let iconEl = null;
+          let tooltipEl = null;
+          
+          if (e && e.currentTarget) {
+            iconEl = e.currentTarget.querySelector("i");
+            tooltipEl = e.currentTarget.querySelector("span");
+          } else {
+            iconEl = document.getElementById("modal-copy-icon");
+            tooltipEl = document.getElementById("modal-copy-tooltip");
+          }
+          
+          if (iconEl) {
+            const originalIcon = iconEl.getAttribute("data-lucide");
+            iconEl.setAttribute("data-lucide", "check");
+            iconEl.classList.remove("text-slate-700", "dark:text-slate-200");
+            iconEl.classList.add("text-green-600", "dark:text-green-400");
+            lucide.createIcons();
+            
+            if (tooltipEl) {
+              const originalText = tooltipEl.innerText;
+              tooltipEl.innerText = "Copied!";
+              tooltipEl.classList.remove("opacity-0");
+              tooltipEl.classList.add("opacity-100");
+              
+              setTimeout(() => {
+                iconEl.setAttribute("data-lucide", originalIcon || "copy");
+                iconEl.classList.remove("text-green-600", "dark:text-green-400");
+                iconEl.classList.add("text-slate-700", "dark:text-slate-200");
+                tooltipEl.innerText = originalText;
+                tooltipEl.classList.add("opacity-0");
+                tooltipEl.classList.remove("opacity-100");
+                lucide.createIcons();
+              }, 1200);
+            } else {
+              setTimeout(() => {
+                iconEl.setAttribute("data-lucide", originalIcon || "copy");
+                iconEl.classList.remove("text-green-600", "dark:text-green-400");
+                iconEl.classList.add("text-slate-700", "dark:text-slate-200");
+                lucide.createIcons();
+              }, 1200);
+            }
+          }
+        }).catch(err => {
+          console.error("Failed to copy name text:", err);
+        });
+      }
+
       // 7. GRID RENDERER
       function renderGrid(items) {
         productGrid.innerHTML = "";
 
         items.forEach((p, idx) => {
           const card = document.createElement("div");
-          card.className = "group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition duration-300 flex flex-col justify-between cursor-pointer animate-fade-in";
-          card.style.animationDelay = `${Math.min(idx * 20, 300)}ms`;
+          card.className = "group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition duration-300 flex flex-col justify-between cursor-pointer animate-fade-in";
+          card.style.animationDelay = `${Math.min(idx * 20, 250)}ms`;
 
           // Image frame fallback container
           const imgUrl = p.Image_URL && p.Image_URL.trim() ? p.Image_URL : parentEmptyImage;
 
           let badgeGeoToken = "";
-          if (p.Geo_Zone && p.Geo_Zone !== "-") {
+          if (p.Geo_Zone && p.Geo_Zone !== "-" && activeColumns.geozone) {
             badgeGeoToken = `
-              <div class="absolute top-3 right-3 bg-indigo-55/90 backdrop-blur-md text-indigo-700 text-[10px] py-1 px-2 rounded-lg font-bold tracking-wider uppercase border border-indigo-100 shadow-3xs">
+              <div class="absolute top-3 right-3 bg-indigo-50/90 dark:bg-indigo-950/90 backdrop-blur-md text-indigo-700 dark:text-indigo-400 text-[10px] py-1 px-2 rounded-lg font-bold tracking-wider uppercase border border-indigo-100 dark:border-indigo-900 shadow-3xs">
                 ${p.Geo_Zone}
               </div>
             `;
           }
 
           let priceToken = "";
-          if (p.Price && p.Price !== "-") {
+          if (p.Price && p.Price !== "-" && activeColumns.price) {
             priceToken = `
-              <span class="text-xs font-extrabold text-indigo-600 font-mono whitespace-nowrap bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100/30">
+              <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 font-mono whitespace-nowrap bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-100/30">
                 ${p.Price}
               </span>
             `;
           }
 
           let descToken = "";
-          if (p.Description && p.Description !== "-") {
+          if (p.Description && p.Description !== "-" && activeColumns.description) {
             descToken = `
-              <p class="text-slate-400 text-xs mt-1.5 font-normal leading-normal line-clamp-2">
+              <p class="text-slate-400 dark:text-slate-550 text-xs mt-1.5 font-normal leading-normal line-clamp-2">
                 ${p.Description}
               </p>
             `;
           }
 
-          card.innerHTML = `
-            <!-- Image frame -->
-            <div class="relative aspect-video sm:aspect-square bg-slate-100/30 overflow-hidden border-b border-slate-100 flex items-center justify-center">
-              <img 
-                src="${imgUrl}" 
-                alt="${p.Name || 'Product thumbnail'}" 
-                loading="lazy" 
-                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2 text-xs text-slate-400 text-center"
-                onerror="this.onerror=null; this.src='${parentEmptyImage}'; this.alt='No image'; "
-              />
-              <!-- Row Tag badge -->
-              <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-[10px] font-mono text-white py-1 px-2 rounded-md font-medium shadow-3xs">
-                Row ${p.rowNumber}
+          // Image container tag (Requirement 3)
+          let imageBoxHtml = "";
+          if (activeColumns.image) {
+            // Escaped product name for safe integration into string literal parameter
+            const escapeNameStr = (p.Name || 'Product').replace(/`/g, '\\`').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            
+            imageBoxHtml = `
+              <div class="relative aspect-video sm:aspect-square bg-slate-100/30 dark:bg-slate-950/40 overflow-hidden border-b border-slate-100 dark:border-slate-800 flex items-center justify-center">
+                
+                <!-- Copy image Product Name Floating Left (Requirement 4) -->
+                <button 
+                  onclick="copyToClipboard(event, \`${escapeNameStr}\`)"
+                  class="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs select-none shadow-md text-slate-700 dark:text-slate-200 hover:text-indigo-605 dark:hover:text-indigo-400 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 transition hover:scale-110 active:scale-90 cursor-pointer flex items-center justify-center group/card-copy" 
+                  title="Copy Product Name"
+                >
+                  <i id="copy-card-ico-${p.rowNumber}" data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span class="absolute left-full ml-1.5 bg-slate-950 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/card-copy:opacity-100 transition whitespace-nowrap pointer-events-none shadow-sm font-sans">Copy Name</span>
+                </button>
+
+                <img 
+                  src="${imgUrl}" 
+                  alt="${p.Name || 'Product thumbnail'}" 
+                  loading="lazy" 
+                  class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2 text-xs text-slate-400 text-center"
+                  onerror="this.onerror=null; this.src='${parentEmptyImage}'; this.alt='No image'; "
+                />
+                
+                <!-- Row Tag badge -->
+                <div class="absolute top-3 right-3 sm:right-auto sm:left-3 bg-slate-900/85 dark:bg-slate-800/85 backdrop-blur-md text-[10px] font-mono text-white py-1 px-2 rounded-md font-medium shadow-3xs">
+                  Row ${p.rowNumber}
+                </div>
+                ${badgeGeoToken}
               </div>
-              ${badgeGeoToken}
-            </div>
+            `;
+          }
+
+          // Fields layout columns conditionals (Requirement 3)
+          let brandHeaderHtml = "";
+          if (activeColumns.brand) {
+            brandHeaderHtml = `
+              <span class="text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-505 font-bold truncate max-w-[120px]">
+                ${p.Brand && p.Brand !== '-' ? p.Brand : 'Generic Brand'}
+              </span>
+            `;
+          }
+
+          let nameHeaderHtml = "";
+          if (activeColumns.name) {
+            nameHeaderHtml = `
+              <h3 class="font-bold text-slate-805 dark:text-slate-100 text-sm leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition truncate" title="${p.Name} (Row ${p.rowNumber})">
+                ${p.Name} (Row <span class="font-mono">${p.rowNumber}</span>)
+              </h3>
+            `;
+          }
+
+          let itemNumFooterHtml = "";
+          if (activeColumns.itemnumber) {
+            itemNumFooterHtml = `<span class="font-mono text-[10px]">Num: ${p.Itemnumber && p.Itemnumber !== '-' ? p.Itemnumber : 'N/A'}</span>`;
+          }
+
+          card.innerHTML = `
+            ${imageBoxHtml}
 
             <!-- Context block -->
             <div class="p-4 flex-1 flex flex-col justify-between">
               <div>
                 <div class="flex items-start justify-between gap-2 mb-1.5">
-                  <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold truncate max-w-[120px]">
-                    ${p.Brand && p.Brand !== '-' ? p.Brand : 'Generic Brand'}
-                  </span>
+                  ${brandHeaderHtml}
                   ${priceToken}
                 </div>
 
-                <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-indigo-600 transition truncate" title="${p.Name} (Row ${p.rowNumber})">
-                  ${p.Name} (Row <span class="font-mono">${p.rowNumber}</span>)
-                </h3>
-
+                ${nameHeaderHtml}
                 ${descToken}
               </div>
 
               <!-- Item number foot -->
-              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-405 font-medium">
-                <span class="font-mono text-[10px]">Num: ${p.Itemnumber && p.Itemnumber !== '-' ? p.Itemnumber : 'N/A'}</span>
-                <span class="text-indigo-600 font-semibold inline-flex items-center space-x-0.5 hover:underline">
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-805 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                ${itemNumFooterHtml}
+                <span class="text-indigo-605 dark:text-indigo-400 font-semibold inline-flex items-center space-x-0.5 hover:underline">
                   <span>Details</span>
                   <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 </span>
@@ -967,10 +1230,13 @@
 
       // 8. MODAL WINDOW POPUP DYNAMICS
       function showDetailModal(item) {
+        // Evaluate index of target inside filtered arrays
+        currentModalIndex = activeFilteredProducts.findIndex(p => p.rowNumber === item.rowNumber);
+
         document.getElementById("modalRowNumber").innerText = item.rowNumber || "-";
         
         const badgeCat = document.getElementById("modalCategoryBadge");
-        if (item.Category && item.Category !== "-") {
+        if (item.Category && item.Category !== "-" && activeColumns.category) {
           badgeCat.innerText = item.Category;
           badgeCat.classList.remove("hidden");
         } else {
@@ -982,7 +1248,7 @@
         const brandRow = document.getElementById("modal-brand-row");
         const brandText = document.getElementById("modalBrandText");
         const modalBrand = document.getElementById("modalBrand");
-        if (item.Brand && item.Brand !== "-") {
+        if (item.Brand && item.Brand !== "-" && activeColumns.brand) {
           brandText.innerText = `by ${item.Brand}`;
           brandText.classList.remove("hidden");
           modalBrand.innerText = item.Brand;
@@ -995,17 +1261,18 @@
 
         const descContainer = document.getElementById("modalDescriptionContainer");
         const modalDesc = document.getElementById("modalDescription");
-        if (item.Description && item.Description !== "-") {
+        if (item.Description && item.Description !== "-" && activeColumns.description) {
           modalDesc.innerText = item.Description;
           descContainer.classList.remove("hidden");
         } else {
           descContainer.classList.add("hidden");
         }
 
-        document.getElementById("modalItemnumber").innerText = item.Itemnumber || "-";
-        document.getElementById("modalGeoZone").innerText = item.Geo_Zone || "-";
+        // Mapping other tags with Visibility
+        document.getElementById("modalItemnumber").innerText = activeColumns.itemnumber ? (item.Itemnumber || "-") : "-";
+        document.getElementById("modalGeoZone").innerText = activeColumns.geozone ? (item.Geo_Zone || "-") : "-";
         document.getElementById("modalMasterCanada").innerText = item.Master_List_Canada || "-";
-        document.getElementById("modalPrice").innerText = item.Price && item.Price !== "-" ? item.Price : "N/A";
+        document.getElementById("modalPrice").innerText = (activeColumns.price && item.Price && item.Price !== "-") ? item.Price : "N/A";
 
         const imageEl = document.getElementById("modalImage");
         const fallbackSrc = item.Image_URL && item.Image_URL.trim() ? item.Image_URL : parentEmptyImage;
@@ -1016,14 +1283,36 @@
         };
 
         const originalBtn = document.getElementById("modalOriginalLink");
-        if (item.Image_URL && item.Image_URL.trim()) {
+        if (item.Image_URL && item.Image_URL.trim() && activeColumns.image) {
           originalBtn.href = item.Image_URL;
           originalBtn.classList.remove("hidden");
         } else {
           originalBtn.classList.add("hidden");
         }
 
-        // Show Modal
+        // Configure Sequential Navigation Buttons styling (disable state) (Requirement 1)
+        const prevBtn = document.getElementById("modal-prev-btn");
+        const nextBtn = document.getElementById("modal-next-btn");
+        
+        if (currentModalIndex <= 0) {
+          prevBtn.classList.add("opacity-40", "pointer-events-none");
+        } else {
+          prevBtn.classList.remove("opacity-40", "pointer-events-none");
+        }
+
+        if (currentModalIndex < 0 || currentModalIndex >= activeFilteredProducts.length - 1) {
+          nextBtn.classList.add("opacity-40", "pointer-events-none");
+        } else {
+          nextBtn.classList.remove("opacity-40", "pointer-events-none");
+        }
+
+        // Reconnect copy click event (Requirement 4)
+        const copyBtn = document.getElementById("modal-copy-btn");
+        copyBtn.onclick = (e) => {
+          copyToClipboard(e, item.Name || "No Name");
+        };
+
+        // Show Modal Dialog
         modal.classList.remove("hidden");
         setTimeout(() => {
           modalBox.classList.remove("scale-95", "opacity-0");
@@ -1031,6 +1320,14 @@
         }, 30);
 
         lucide.createIcons();
+      }
+
+      function navigateModalSequential(dir) {
+        if (activeFilteredProducts.length === 0) return;
+        const targetIdx = currentModalIndex + dir;
+        if (targetIdx >= 0 && targetIdx < activeFilteredProducts.length) {
+          showDetailModal(activeFilteredProducts[targetIdx]);
+        }
       }
 
       function closeModal() {
