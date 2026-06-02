@@ -378,10 +378,10 @@
 
         <!-- Graphic Image Column -->
         <div class="w-full md:w-1/2 bg-slate-50/50 dark:bg-slate-950 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-850 relative min-h-[220px]">
-          <!-- Copy Product Name Button (floating on the left side of image) (Requirement 4) -->
-          <button id="modal-copy-btn" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs select-none shadow-md text-slate-700 dark:text-slate-200 hover:text-indigo-650 dark:hover:text-indigo-400 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 transition hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center group" title="Copy Product Name to Clipboard">
+          <!-- Copy Image URL Button (floating on the left side of image) -->
+          <button id="modal-copy-btn" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs select-none shadow-md text-slate-700 dark:text-slate-200 hover:text-indigo-650 dark:hover:text-indigo-400 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 transition hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center group" title="Copy Image URL to Clipboard">
             <i data-lucide="copy" class="w-4 h-4" id="modal-copy-icon"></i>
-            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition duration-155 whitespace-nowrap pointer-events-none" id="modal-copy-tooltip">Copy Name</span>
+            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition duration-155 whitespace-nowrap pointer-events-none" id="modal-copy-tooltip">Copy URL</span>
           </button>
 
           <img 
@@ -1137,20 +1137,20 @@
           // Image container tag (Requirement 3)
           let imageBoxHtml = "";
           if (activeColumns.image) {
-            // Escaped product name for safe integration into string literal parameter
-            const escapeNameStr = (p.Name || 'Product').replace(/`/g, '\\`').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            // Escaped product Image URL for safe integration into string literal parameter
+            const escapeImgUrlStr = (p.Image_URL || '').replace(/`/g, '\\`').replace(/'/g, "\\'").replace(/"/g, '&quot;');
             
             imageBoxHtml = `
               <div class="relative aspect-video sm:aspect-square bg-slate-100/30 dark:bg-slate-950/40 overflow-hidden border-b border-slate-100 dark:border-slate-800 flex items-center justify-center">
                 
-                <!-- Copy image Product Name Floating Left (Requirement 4) -->
+                <!-- Copy Product Image URL Floating Left -->
                 <button 
-                  onclick="copyToClipboard(event, \`${escapeNameStr}\`)"
+                  onclick="copyToClipboard(event, \`${escapeImgUrlStr}\`)"
                   class="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs select-none shadow-md text-slate-700 dark:text-slate-200 hover:text-indigo-605 dark:hover:text-indigo-400 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 transition hover:scale-110 active:scale-90 cursor-pointer flex items-center justify-center group/card-copy" 
-                  title="Copy Product Name"
+                  title="Copy Image URL"
                 >
                   <i id="copy-card-ico-${p.rowNumber}" data-lucide="copy" class="w-3.5 h-3.5"></i>
-                  <span class="absolute left-full ml-1.5 bg-slate-950 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/card-copy:opacity-100 transition whitespace-nowrap pointer-events-none shadow-sm font-sans">Copy Name</span>
+                  <span class="absolute left-full ml-1.5 bg-slate-950 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/card-copy:opacity-100 transition whitespace-nowrap pointer-events-none shadow-sm font-sans">Copy URL</span>
                 </button>
 
                 <img 
@@ -1309,7 +1309,7 @@
         // Reconnect copy click event (Requirement 4)
         const copyBtn = document.getElementById("modal-copy-btn");
         copyBtn.onclick = (e) => {
-          copyToClipboard(e, item.Name || "No Name");
+          copyToClipboard(e, item.Image_URL || "");
         };
 
         // Show Modal Dialog
